@@ -14,8 +14,11 @@ class sp(Process):
         self.run()
     
     def playback(self, filename: str, sbStream: pyaudio, out_index: int, volume = 0.15):
+        global thisFolder
+        thisFolder = os.path.dirname(os.path.abspath(__file__))
+
         try:
-            with wave.open(f'Sounds/{filename}.wav', 'rb') as wf:
+            with wave.open(f'{thisFolder}/Sounds/{filename}.wav', 'rb') as wf:
                         print(f"Playing {filename}...")
                         # Define callback for playback (1)
                         def callback(in_data, frame_count, time_info, status):
@@ -64,7 +67,8 @@ class sp(Process):
             else:
                 name = message[:message.rfind("/")]
                 volume = message[message.rfind("/") + 1:-1]
-                print(name + "|" + volume)
+                # print(name + "|" + volume)
+                print(name)
                 toMe = threading.Thread(target=self.playback, args=(name, sounds, 4, (float(volume) / 100)), daemon=True)
                 toThem = threading.Thread(target=self.playback, args=(name, sounds, 5, (float(volume) / 100)), daemon= True)
                 toMe.start()

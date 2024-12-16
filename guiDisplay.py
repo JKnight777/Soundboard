@@ -12,8 +12,9 @@ class gui(Process):
     def change(self, right: bool):
         global currPage
         global volume
+        global thisFolder
 
-        names = os.listdir('./Sounds')
+        names = os.listdir(thisFolder + '/Sounds')
         maxPages = (len(names) // 9) + 1 # if len(names) // 9 > 0 else 1
 
         if right:
@@ -66,7 +67,9 @@ class gui(Process):
         buttons = [tk.Button(buttonframe, text="Null", font=('Arial', 10)) for i in range(9)]
         playQueue = list()
 
-        names = os.listdir('./Sounds')
+        global thisFolder
+        thisFolder = os.path.dirname(os.path.abspath(__file__))
+        names = os.listdir(thisFolder + '/Sounds')
         global currPage
         currPage = 1
         rightButton = tk.Button(text="->", font=('Arial', 10), command=lambda: self.change(True))
