@@ -2,6 +2,7 @@ import os
 import tkinter as tk
 from multiprocessing import Process
 
+global volume
 class gui(Process):
     def __init__(self, ioConn, spConn):
         self.ioConn = ioConn
@@ -11,7 +12,6 @@ class gui(Process):
 
     def change(self, right: bool):
         global currPage
-        global volume
         global thisFolder
 
         names = os.listdir(thisFolder + '/Sounds')
@@ -28,13 +28,13 @@ class gui(Process):
             for j in range(3):
                 buttons[i + (j * 3)].grid(column=i, row=j, sticky=tk.W+tk.E)
                 try:
-                    buttons[i + (j * 3)].configure(text=f"{names[start + i + j * 3][:-4]}", command= lambda this = buttons[i + (j * 3)]: self.spConn.send(this['text'] + "/" + str(volume)))
+                    buttons[i + (j * 3)].configure(text=f"{names[start + i + j * 3][:-4]}", command= lambda this = buttons[i + (j * 3)]: self.spConn.send(this['text'] + "/" + str(volume.get())))
                 except:
                     buttons[i + (j * 3)].configure(text="", command=lambda: None)
     
-    def volumeset(self, v):
-        global volume
-        volume = v
+    # def volumeset(self, v: int):
+    #     global volume
+    #     #volume = v
 
     def run(self):
         global root
@@ -49,9 +49,11 @@ class gui(Process):
         volumeLabel = tk.Label(root, text="Volume", font=('Arial', 12))
         
         global volume
-        volumeslider = tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, command=lambda: self.volumeset(v=volumeslider.get()))
+        volume = tk.IntVar()
+        volumeslider = tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, variable=volume)
         volumeslider.set(50)
-        volume = 50
+        volume.set(50)
+        #volumeslider.configure(command=lambda: print(volumeslider.get()))
 
         #stopButton = tk.Button(text="☐", font=('Arial', 10), command=lambda: stopAll())
 
@@ -78,7 +80,7 @@ class gui(Process):
         for i in range(3):
             for j in range(3):
                 buttons[i + (j * 3)].grid(column=i, row=j, sticky=tk.W+tk.E)
-                buttons[i + (j * 3)].configure(text=f"{names[i + (j * 3)][:-4]}", command= lambda this = buttons[i + (j * 3)]: self.spConn.send(this['text'] + "/" + str(volume)))
+                buttons[i + (j * 3)].configure(text=f"{names[i + (j * 3)][:-4]}", command= lambda this = buttons[i + (j * 3)]: self.spConn.send(this['text'] + "/" + str(volume.get())))
                 
         titleLabel.pack()
         buttonframe.pack(fill=tk.BOTH, padx=20, pady=20,side=tk.TOP)

@@ -66,10 +66,10 @@ class sp(Process):
             
             else:
                 name = message[:message.rfind("/")]
-                volume = message[message.rfind("/") + 1:-1]
-                # print(name + "|" + volume)
+                volume = message[message.rfind("/") + 1:]
+                print(name + "|" + volume)
                 print(name)
-                toMe = threading.Thread(target=self.playback, args=(name, sounds, 4, (float(volume) / 100)), daemon=True)
-                toThem = threading.Thread(target=self.playback, args=(name, sounds, 5, (float(volume) / 100)), daemon= True)
+                toMe = threading.Thread(target=self.playback, args=(name, sounds, 4, (float(volume) / 1000)), daemon=True)
+                toThem = threading.Thread(target=self.playback, args=(name, sounds, 5, (float(volume) / 1000)), daemon= True)
                 toMe.start()
                 toThem.start()
