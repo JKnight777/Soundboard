@@ -1,4 +1,5 @@
 import os
+import sys
 from multiprocessing import Process
 import threading
 import pyaudio
@@ -6,20 +7,19 @@ import wave
 import time
 import numpy as np
 
-class sp(Process):
+class Sp(Process):
     def __init__(self, conn):
         self.conn = conn
-        print("hi")
         #Process.__init__(self)
         self.run()
     
     def playback(self, filename: str, sbStream: pyaudio, out_index: int, volume = 0.15):
         global thisFolder
-        thisFolder = os.path.dirname(os.path.abspath(__file__))
+        thisFolder = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
 
         try:
             with wave.open(f'{thisFolder}/Sounds/{filename}.wav', 'rb') as wf:
-                        print(f"Playing {filename}...")
+                        print(f"Playing {filename} at volume {volume}...")
                         # Define callback for playback (1)
                         def callback(in_data, frame_count, time_info, status):
                             data = wf.readframes(frame_count)
@@ -54,9 +54,8 @@ class sp(Process):
             print("Uh-oh")
 
     def run(self):
-        print("hi again")
         sounds = pyaudio.PyAudio()
-        print(f"Hi, I'm the sound player delivering your sick sounds! My pid is {os.getpid()} and my parent is {os.getppid()}.\n")
+        print(f"Hi, I'm the sound player delivering your sounds! My pid is {os.getpid()} and my parent is {os.getppid()}.\n")
 
         message = ""
         while not self.conn.poll() or message != "TERMINATE":
@@ -65,11 +64,14 @@ class sp(Process):
                 break
             
             else:
-                name = message[:message.rfind("/")]
-                volume = message[message.rfind("/") + 1:]
-                print(name + "|" + volume)
-                print(name)
-                toMe = threading.Thread(target=self.playback, args=(name, sounds, 4, (float(volume) / 1000)), daemon=True)
-                toThem = threading.Thread(target=self.playback, args=(name, sounds, 5, (float(volume) / 1000)), daemon= True)
+                name = message[0]
+                volume = message[1]
+                output_device = message[2]
+                virtual_cable = message[3]
+
+                toMe = threading.Thread(target=self.playback, args=(name, sounds, output_device, (float(volume) / 1000)), daemon=True)
+                toThem = threading.Thread(target=self.playback, args=(name, sounds, virtual_cable, (float(volume) / 1000)), daemon= True)
                 toMe.start()
                 toThem.start()
+        
+        sounds.terminate()

@@ -8,3 +8,10 @@
 /Soundboard_Gui.py
 /Sounds
 /ffmpeg.exe
+/devices.json
+/Lib
+/Include
+/sb-env
+/Scripts
+/pyvenv.cfg
+/__pycache__
